@@ -3,10 +3,16 @@ from sklearn.metrics.pairwise import cosine_similarity
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 import textstat as ts
 import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 ### INITIALIZATION ###
+#Stemmer
 stem = StemmerFactory()
 idn_stemmer = stem.create_stemmer()
+#Visualization
+fig = plt.figure(figsize=(10, 7))
+ax = fig.add_subplot(111, projection='3d')
 
 ### PREPROCESSING ###
 def preprocess_text(text):
@@ -52,3 +58,13 @@ def wcr_feature(kolom_kunci, kolom_jawab):
 def features_combine(*arrays):
     reshaped_array = [np.array(arr).reshape(-1, 1) for arr in arrays]
     return np.hstack(reshaped_array)
+
+### Visualization ###
+def scatter_3d(features_matrix):
+    ax.scatter(features_matrix[:, 0], features_matrix[:, 1], features_matrix[:, 2], c='red', alpha=0.7, edgecolors='k')
+
+    ax.set_xlabel("Unigram Feature")
+    ax.set_ylabel("Bigram Feature")
+    ax.set_zlabel("WC Ratio Feature")
+    ax.set_title("3D Scatter Plot of Features")
+    plt.show()
