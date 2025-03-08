@@ -1,12 +1,9 @@
-from sklearn.model_selection import train_test_split, cross_val_score, KFold
-from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.svm import SVC
 from sklearn.metrics import confusion_matrix, classification_report
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
-import textstat as ts
 import pandas as pd
 import numpy as np
+import processFunction as pf
 
 ### INITIALIZATION ###
 # Indonesian Stemmer
@@ -19,13 +16,8 @@ data_csv = pd.read_csv(csv_file_path)
 ######################
 
 ### PREPROCESSING ###
-def preprocess_text(text):
-    text = str(text).lower()
-    text = idn_stemmer.stem(text)
-    return text
-
-data_csv['answer'] = data_csv['answer'].apply(preprocess_text)
-data_csv['answerKeys'] = data_csv['answerKeys'].apply(preprocess_text)
+data_csv['answer'] = pf.apply_preprocess(data_csv['answer'])
+data_csv['answerKeys'] = pf.apply_preprocess(data_csv['answerKeys'])
 #####################
 
 ### TRAINING INITIALIZATION ###
@@ -33,11 +25,6 @@ model = SVC(kernel='rbf')
 
 idsoal_list = data_csv['IDPSJ'].unique()
 
-x_train = data_csv['answer']
-y_train = data_csv['labela']
-
-vectorizer_tfidf_unigram = TfidfVectorizer(ngram_range=(1,1))
-vectorizer_tfidf_bigram = TfidfVectorizer(ngram_range=(2,2))
 ###############################
 
 for idsoal in idsoal_list:
@@ -46,41 +33,19 @@ for idsoal in idsoal_list:
 
     ### FEATURE EXTRACTION ###
     # FEATURE 1
-    # TF-IDF Unigram
-    tfidf_features_unigram = vectorizer_tfidf_unigram.fit_transform(subset['answer'])
-    tfidf_kunci_unigram = vectorizer_tfidf_unigram.transform(subset['answerKeys'])
-    # Cosim Unigram
-    unigram_cosim = [
-        cosine_similarity(tfidf_features_unigram[i], tfidf_kunci_unigram[i])[0, 0] if tfidf_features_unigram[i].nnz > 0 else 0
-        for i in range(tfidf_features_unigram.shape[0])
-    ]
+    unigram_feature = pf.unigram_cosim_feature(subset['answerKeys'],subset['answer'])
 
     # FEATURE 2
-    # TF-IDF Bigram
-    tfidf_features_bigram = vectorizer_tfidf_bigram.fit_transform(subset['answer'])
-    tfidf_kunci_bigram = vectorizer_tfidf_bigram.transform(subset['answerKeys'])
-    # Cosim Bigram
-    bigram_cosim = [
-        cosine_similarity(tfidf_features_bigram[i], tfidf_kunci_bigram[i])[0, 0] if tfidf_features_bigram[i].nnz > 0 else 0
-        for i in range(tfidf_features_bigram.shape[0])
-    ]
-
-    #FEATURE 2
-    # Word Count Ratio
-    wc_ratio = []
-    jawaban_list = subset['answer'].tolist()
-    kunci_jawaban = subset['answerKeys'].tolist()[0]
-    word_limit = ts.lexicon_count(kunci_jawaban)
-    for jawaban_siswa in jawaban_list:
-        word_count = ts.lexicon_count(jawaban_siswa)
-        wc_ratio.append(1-(word_count/word_limit))
-
+    bigram_feature = pf.bigram_cosim_feature(subset['answerKeys'],subset['answer'])
+    
+    #FEATURE 3
+    wc_ratio_feature = pf.wcr_feature(subset['answerKeys'],subset['answer'])
+    
     # Combining features
-    x_final = np.hstack((np.array(unigram_cosim).reshape(-1,1), np.array(bigram_cosim).reshape(-1,1), np.array(wc_ratio).reshape(-1,1)))
+    x_final = np.hstack((np.array(unigram_feature).reshape(-1,1), np.array(bigram_feature).reshape(-1,1), np.array(wc_ratio_feature).reshape(-1,1)))
     ##########################
     
     y = subset['labela']
-
 
     #Training
     model.fit(x_final, y)
@@ -91,13 +56,10 @@ print("Training completed")
 csv_file_path = 'testDataset.csv'
 data_csv = pd.read_csv(csv_file_path)
 
-data_csv['answer'] = data_csv['answer'].apply(preprocess_text)
-data_csv['answerKeys'] = data_csv['answerKeys'].apply(preprocess_text)
+data_csv['answer'] = pf.apply_preprocess(data_csv['answer'])
+data_csv['answerKeys'] = pf.apply_preprocess(data_csv['answerKeys'])
 
 idsoal_list = data_csv['IDPSJ'].unique()
-
-x_test = data_csv['answer']
-y_test = data_csv['labela']
 
 for idsoal in idsoal_list:
     print(f"Testing for IDSoal: {idsoal}")
@@ -105,41 +67,19 @@ for idsoal in idsoal_list:
 
     ### FEATURE EXTRACTION ###
     # FEATURE 1
-    # TF-IDF Unigram
-    tfidf_features_unigram = vectorizer_tfidf_unigram.fit_transform(subset['answer'])
-    tfidf_kunci_unigram = vectorizer_tfidf_unigram.transform(subset['answerKeys'])
-    # Cosim Unigram
-    unigram_cosim = [
-        cosine_similarity(tfidf_features_unigram[i], tfidf_kunci_unigram[i])[0, 0] if tfidf_features_unigram[i].nnz > 0 else 0
-        for i in range(tfidf_features_unigram.shape[0])
-    ]
-
+    unigram_feature = pf.unigram_cosim_feature(subset['answerKeys'],subset['answer'])
+    
     # FEATURE 2
-    # TF-IDF Bigram
-    tfidf_features_bigram = vectorizer_tfidf_bigram.fit_transform(subset['answer'])
-    tfidf_kunci_bigram = vectorizer_tfidf_bigram.transform(subset['answerKeys'])
-    # Cosim Bigram
-    bigram_cosim = [
-        cosine_similarity(tfidf_features_bigram[i], tfidf_kunci_bigram[i])[0, 0] if tfidf_features_bigram[i].nnz > 0 else 0
-        for i in range(tfidf_features_bigram.shape[0])
-    ]
-
+    bigram_feature = pf.bigram_cosim_feature(subset['answerKeys'],subset['answer'])
+    
     #FEATURE 2
-    # Word Count Ratio
-    wc_ratio = []
-    jawaban_list = subset['answer'].tolist()
-    kunci_jawaban = subset['answerKeys'].tolist()[0]
-    word_limit = ts.lexicon_count(kunci_jawaban)
-    for jawaban_siswa in jawaban_list:
-        word_count = ts.lexicon_count(jawaban_siswa)
-        wc_ratio.append(1-(word_count/word_limit))
-
+    wc_ratio_feature = pf.wcr_feature(subset['answerKeys'],subset['answer'])
+    
     # Combining features
-    x_test = np.hstack((np.array(unigram_cosim).reshape(-1,1), np.array(bigram_cosim).reshape(-1,1), np.array(wc_ratio).reshape(-1,1)))
+    x_test = np.hstack((np.array(unigram_feature).reshape(-1,1), np.array(bigram_feature).reshape(-1,1), np.array(wc_ratio_feature).reshape(-1,1)))
     ##########################
     
     y_test = subset['labela']
-
 
     #Testing
     y_pred = model.predict(x_test)
