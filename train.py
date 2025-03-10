@@ -2,7 +2,9 @@ from sklearn.svm import SVC
 from sklearn.model_selection import KFold, cross_val_score
 from sklearn.metrics import confusion_matrix, classification_report
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
+from imblearn.over_sampling import SMOTE
 import pandas as pd
+import numpy as np
 import processFunction as pf
 
 ### INITIALIZATION ###
@@ -11,7 +13,7 @@ stem = StemmerFactory()
 idn_stemmer = stem.create_stemmer()
 
 # Load dataset
-csv_file_path = 'trainDataset.csv'
+csv_file_path = 'trainSet.csv'
 data_csv = pd.read_csv(csv_file_path)
 ######################
 
@@ -22,7 +24,7 @@ data_csv['answerKeys'] = pf.apply_preprocess(data_csv['answerKeys'])
 
 ### TRAINING INITIALIZATION ###
 model = SVC(kernel='rbf')
-
+smote = SMOTE(random_state=42)
 idsoal_list = data_csv['IDPSJ'].unique()
 ###############################
 
@@ -44,10 +46,15 @@ for idsoal in idsoal_list:
     x_final = pf.features_combine(unigram_feature,bigram_feature,wc_ratio_feature)
     ##########################
     
-    y = subset['labela']
+    y = subset['label']
     
+    ### SMOTE ###
+    x_final, y = smote.fit_resample(x_final,y)
+    print("Data setelah proses SMOTE: ", np.bincount(y))
+    #############
+
     ### VALIDATION ###
-    kfold = KFold(n_splits=5)
+    kfold = KFold(n_splits=5, shuffle=True, random_state=42)
     results_kfold =cross_val_score(model, x_final, y, cv=kfold)
     print("Accuracy: %.2f%%" % (results_kfold.mean()*100.0))
     ##################
@@ -87,7 +94,7 @@ print("Training completed")
 #     x_test = np.hstack((np.array(unigram_feature).reshape(-1,1), np.array(bigram_feature).reshape(-1,1), np.array(wc_ratio_feature).reshape(-1,1)))
 #     ##########################
     
-#     y_test = subset['labela']
+#     y_test = subset['label']
 
 #     #Testing
 #     y_pred = model.predict(x_test)
