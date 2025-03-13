@@ -3,6 +3,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 import textstat as ts
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
@@ -69,8 +70,8 @@ def ttr_feature(kolom_jawab):
     return tt_ratio
 
 def features_combine(*arrays):
-    reshaped_array = [np.array(arr).reshape(-1, 1) for arr in arrays]
-    return np.hstack(reshaped_array)
+    reshaped_array = [pd.Series(arr).to_frame() for arr in arrays]
+    return pd.concat(reshaped_array, axis=1)
 
 ### Visualization ###
 def scatter_3d(features_matrix):
