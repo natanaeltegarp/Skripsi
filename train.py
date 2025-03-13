@@ -1,19 +1,13 @@
 from sklearn.svm import SVC
 from sklearn.model_selection import KFold, cross_val_score
-from sklearn.metrics import confusion_matrix, classification_report
-from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 from imblearn.over_sampling import SMOTE
 import pandas as pd
 import numpy as np
 import processFunction as pf
 
 ### INITIALIZATION ###
-# Indonesian Stemmer
-stem = StemmerFactory()
-idn_stemmer = stem.create_stemmer()
 
-# Load dataset
-csv_file_path = 'trainSet.csv'
+csv_file_path = 'trainSet-8q.csv'
 data_csv = pd.read_csv(csv_file_path)
 ######################
 
@@ -40,10 +34,10 @@ for idsoal in idsoal_list:
     bigram_feature = pf.bigram_cosim_feature(subset['answerKeys'],subset['answer'])
     
     #FEATURE 3
-    wc_ratio_feature = pf.wcr_feature(subset['answerKeys'],subset['answer'])
+    tt_ratio_feature = pf.ttr_feature(subset['answer'])
     
     # Combining features
-    x_final = pf.features_combine(unigram_feature,bigram_feature,wc_ratio_feature)
+    x_final = pf.features_combine(unigram_feature,bigram_feature,tt_ratio_feature)
     ##########################
     
     y = subset['label']

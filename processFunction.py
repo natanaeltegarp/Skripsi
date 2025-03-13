@@ -55,6 +55,19 @@ def wcr_feature(kolom_kunci, kolom_jawab):
         wc_ratio.append(1-(word_count/word_limit))
     return wc_ratio
 
+def ttr_feature(kolom_jawab):
+    tt_ratio = []
+    jawaban_list = kolom_jawab.tolist()
+    for jawaban_siswa in jawaban_list:
+        token_jawaban = jawaban_siswa.split()
+        type_jawaban = set(token_jawaban)
+        if len(type_jawaban) == 0:
+            ttr = 0
+        else:
+            ttr = len(token_jawaban)/len(type_jawaban)
+        tt_ratio.append(ttr)
+    return tt_ratio
+
 def features_combine(*arrays):
     reshaped_array = [np.array(arr).reshape(-1, 1) for arr in arrays]
     return np.hstack(reshaped_array)
