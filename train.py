@@ -7,10 +7,10 @@ import processFunction as pf
 
 ### INITIALIZATION ###
 
-csv_file_path = 'trainSet-8q-features.csv'
+csv_file_path = 'trainSet-stelma-features.csv'
 data_csv = pd.read_csv(csv_file_path)
 
-model = SVC(kernel='rbf')
+model = SVC(kernel='poly')
 smote = SMOTE(random_state=42)
 idsoal_list = data_csv['IDPSJ'].unique()
 #######################
@@ -21,12 +21,11 @@ for idsoal in idsoal_list:
 
     x = subset[['Cosim-Unigram','Cosim-Bigram','TypeTokenRatio']]    
     y = subset['label']
-    
+
     ### SMOTE ###
     x, y = smote.fit_resample(x,y)
     print("Data setelah proses SMOTE: ", np.bincount(y))
     #############
-
     ### VALIDATION ###
     kfold = KFold(n_splits=5, shuffle=True, random_state=42)
     results_kfold =cross_val_score(model, x, y, cv=kfold)
@@ -34,7 +33,7 @@ for idsoal in idsoal_list:
     ##################
 
     #Visualization
-    # pf.scatter_3d(x_final)
+    pf.scatter_3d(x, y)
 
     #Training
     model.fit(x, y)

@@ -11,9 +11,7 @@ from mpl_toolkits.mplot3d import Axes3D
 #Stemmer
 stem = StemmerFactory()
 idn_stemmer = stem.create_stemmer()
-#Visualization
-fig = plt.figure(figsize=(10, 7))
-ax = fig.add_subplot(111, projection='3d')
+
 
 ### PREPROCESSING ###
 def preprocess_text(text):
@@ -74,11 +72,19 @@ def features_combine(*arrays):
     return pd.concat(reshaped_array, axis=1)
 
 ### Visualization ###
-def scatter_3d(features_matrix):
-    ax.scatter(features_matrix[:, 0], features_matrix[:, 1], features_matrix[:, 2], c='red', alpha=0.7, edgecolors='k')
+def scatter_3d(features_matrix, label):
+    fig = plt.figure(figsize=(10, 7))
+    ax = fig.add_subplot(111, projection='3d')
+    scatter = ax.scatter(features_matrix['Cosim-Unigram'], 
+                        features_matrix['Cosim-Bigram'], 
+                        features_matrix['TypeTokenRatio'], 
+                        c=label, cmap='viridis', alpha=0.7, edgecolors='k')
+        
+    cbar = fig.colorbar(scatter, ax=ax)
+    cbar.set_label('Label')
 
     ax.set_xlabel("Unigram Feature")
     ax.set_ylabel("Bigram Feature")
-    ax.set_zlabel("WC Ratio Feature")
+    ax.set_zlabel("TT Ratio Feature")
     ax.set_title("3D Scatter Plot of Features")
     plt.show()
