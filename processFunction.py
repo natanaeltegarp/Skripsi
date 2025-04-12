@@ -4,6 +4,7 @@ from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 import textstat as ts
 import pandas as pd
 import matplotlib.pyplot as plt
+import math
 from mpl_toolkits.mplot3d import Axes3D
 
 ### INITIALIZATION ###
@@ -44,13 +45,15 @@ def bigram_cosim_feature(kolom_kunci, kolom_jawab):
     return bigram_cosim
 
 def wcr_feature(kolom_kunci, kolom_jawab):
+    k = 5
     wc_ratio = []
     jawaban_list = kolom_jawab.tolist()
     kunci_jawaban = kolom_kunci.tolist()[0]
     word_limit = ts.lexicon_count(kunci_jawaban)
     for jawaban_siswa in jawaban_list:
         word_count = ts.lexicon_count(jawaban_siswa)
-        wc_ratio.append(1-(word_count/word_limit))
+        raw_wcr = 1-(word_count/word_limit)
+        wc_ratio.append(1 /( 1 + math.exp(-k * raw_wcr)))
     return wc_ratio
 
 def ttr_feature(kolom_jawab):
@@ -62,7 +65,7 @@ def ttr_feature(kolom_jawab):
         if len(type_jawaban) == 0:
             ttr = 0
         else:
-            ttr = len(token_jawaban)/len(type_jawaban)
+            ttr = len(type_jawaban)/len(token_jawaban)
         tt_ratio.append(ttr)
     return tt_ratio
 
