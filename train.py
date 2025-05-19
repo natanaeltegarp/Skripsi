@@ -61,7 +61,8 @@ for idsoal in idsoal_list:
     print(f"Precision: {results_precision.mean()*100.0:.2f}%")
     ##################
 
-precision_mean = np.mean(precision_list)
+precision_list = pd.Series(precision_list)
+precision_mean = precision_list.mean()
 print(f"Precision score for this model: {precision_mean*100.0:.2f}%")
 
 with open(csv_file_path[:-12]+model_name+"-model.pkl","wb") as file:

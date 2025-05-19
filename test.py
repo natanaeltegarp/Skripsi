@@ -6,42 +6,43 @@ import pickle
 csv_file_path = 'stelma-test-split-features.csv'
 data_csv = pd.read_csv(csv_file_path)
 
-with open("stelma-train-split-MSVM-model.pkl", "rb") as file:
+with open("stelma-train-split-KNN-model.pkl", "rb") as file:
     model = pickle.load(file)
 
-model_name = "MSVM"
+model_name = "KNN"
 idsoal_list = data_csv['IDPSJ'].unique()
-# rmse_list = []
 
-# for idsoal in idsoal_list:
-#     print(f"Testing for IDSoal: {idsoal}")
-#     subset = data_csv[data_csv['IDPSJ'] == idsoal]
+rmse_list = []
 
-#     x = subset[['Cosim-Unigram','Cosim-Bigram','TypeTokenRatio','WordCountRatio']]
-#     y = subset['label']
+for idsoal in idsoal_list:
+    print(f"Testing for IDSoal: {idsoal}")
+    subset = data_csv[data_csv['IDPSJ'] == idsoal]
 
-#     y_pred = model.predict(x)
-#     cm_csv = confusion_matrix(y, y_pred)
-#     cm_report_csv = classification_report(y, y_pred)
-#     rmse = root_mean_squared_error(y, y_pred)
-#     rmse_list.append(rmse)
+    x = subset[['Cosim-Unigram','Cosim-Bigram','TypeTokenRatio','WordCountRatio']]
+    y = subset['label']
 
-#     print(cm_csv)
-#     print(cm_report_csv)
-#     print(rmse)
-# rmse_mean = np.mean(rmse_list)
-# print(f"RMSE score:  {rmse_mean:.4f}")
+    y_pred = model.predict(x)
+    cm_csv = confusion_matrix(y, y_pred)
+    cm_report_csv = classification_report(y, y_pred)
+    rmse = root_mean_squared_error(y, y_pred)
+    rmse_list.append(rmse)
+
+    print(cm_csv)
+    print(cm_report_csv)
+    print(rmse)
+rmse_mean = np.mean(rmse_list)
+print(f"RMSE score:  {rmse_mean:.4f}")
 
 
-x = data_csv[['Cosim-Unigram','Cosim-Bigram','TypeTokenRatio','WordCountRatio']]
-y = data_csv['label']
+# x = data_csv[['Cosim-Unigram','Cosim-Bigram','TypeTokenRatio','WordCountRatio']]
+# y = data_csv['label']
 
-y_pred = model.predict(x)
-cm_csv = confusion_matrix(y, y_pred)
-cm_report_csv = classification_report(y, y_pred)
-rmse = root_mean_squared_error(y, y_pred)
+# y_pred = model.predict(x)
+# cm_csv = confusion_matrix(y, y_pred)
+# cm_report_csv = classification_report(y, y_pred)
+# rmse = root_mean_squared_error(y, y_pred)
 
-print(model_name)
-print(cm_csv)
-print(cm_report_csv)
-print(f"RMSE score:  {rmse:.4f}")
+# print(model_name)
+# print(cm_csv)
+# print(cm_report_csv)
+# print(f"RMSE score:  {rmse:.4f}")

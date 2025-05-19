@@ -1,6 +1,7 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
+from Sastrawi.StopWordRemover.StopWordRemoverFactory import StopWordRemoverFactory
 import textstat as ts
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -8,6 +9,8 @@ import math
 
 ### INITIALIZATION ###
 #Stemmer
+stop = StopWordRemoverFactory()
+stopword_remover = stop.create_stop_word_remover()
 stem = StemmerFactory()
 idn_stemmer = stem.create_stemmer()
 
@@ -15,6 +18,7 @@ idn_stemmer = stem.create_stemmer()
 ### PREPROCESSING ###
 def preprocess_text(text):
     text = str(text).lower()
+    text = stopword_remover.remove(text)
     text = idn_stemmer.stem(text)
     return text
 
