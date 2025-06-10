@@ -15,7 +15,10 @@ import pickle
 csv_file_path = 'stelma-train-split-features.csv'
 data_csv = pd.read_csv(csv_file_path)
 
+
 model_name = "MSVM"
+# model = SVC(kernel='linear')
+# model = SVC(kernel='poly', degree=5)
 model = SVC(kernel='rbf', gamma=100)
 # model = LogisticRegression()
 # model = KNeighborsClassifier(n_neighbors=3)

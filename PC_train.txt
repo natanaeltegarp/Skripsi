@@ -1,0 +1,31 @@
+LOAD fitur_data_latih
+
+model ← inisialisasi model
+smote ← inisialisasi smote
+
+id_soal_list ← kumpulan nilai kolom id_soal unik pada fitur_data_latih
+precision_list ← array kosong
+
+FOR EACH idsoal IN id_soal_list DO
+    subset ← seluruh baris fitur_data_latih yang memiliki nilai kolom id_soal = idsoal
+    x ← kolom 'Cosim-Unigram', 'Cosim-Bigram', 'TypeTokenRatio', dan 'WordCountRatio' dari subset
+    y ← kolom 'label' dari subset
+
+    (x, y) ← smote(x,y)
+
+    TRAIN model
+
+    kfold ← KFold dengan 5 split, data diacak, dan seed acak = 42
+
+    results_precision ← hasil cross_val_score dari model menggunakan data x dan y, dengan pembagian kfold
+
+    precision_rata ← rata-rata dari results_precision
+    tambahkan precision_rata ke dalam precision_list
+END FOR
+
+precision_mean ← rata-rata dari seluruh nilai dalam precision_list
+
+PRINT precision_mean
+
+SAVE model ke file
+

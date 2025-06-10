@@ -1,0 +1,86 @@
+FUNCTION preprocess(text)
+    text ← ubahKeHurufKecil(text)
+    text ← hapusStopwords(text)
+    text ← stem(text)
+    RETURN text
+END FUNCTION
+
+FUNCTION unigram_cosim(kolom_jawaban, kolom_kunci_jawaban)
+    vectorizer_tfidf_unigram ← TfidfVectorizer WITH ngram_range = (1, 1)
+    tfidf_jawab ← vectorizer_tfidf_unigram.fit_transform(kolom_jawaban)
+    tfidf_kunci ← vectorizer_tfidf_unigram.fit_transform(kolom_kunci_jawaban)
+    n ← jumlah baris tfidf_features_unigram
+    FOR i ← 0 TO n - 1 DO
+        IF tfidf_features_unigram[i] ≠ vektor nol THEN
+            unigram_cosim[i] ← cosine_similarity antara tfidf_features_unigram[i] dan tfidf_kunci_unigram[i]
+        ELSE
+            unigram_cosim[i] ← 0
+        END IF
+    END FOR
+    RETURN unigram_cosim
+END FUNCTION
+
+FUNCTION bigram_cosim(kolom_jawaban, kolom_kunci_jawaban)
+    vectorizer_tfidf_bigram ← TfidfVectorizer dengan parameter ngram_range = (2, 2)
+
+    tfidf_features_bigram ← vectorizer_tfidf_bigram.fit_transform(kolom_jawab)
+    tfidf_kunci_bigram ← vectorizer_tfidf_bigram.transform(kolom_kunci)
+
+    n ← jumlah baris tfidf_features_bigram
+    FOR i ← 0 TO n - 1 DO
+        IF tfidf_features_bigram[i] ≠ vektor nol THEN
+            bigram_cosim[i] ← cosine_similarity antara tfidf_features_bigram[i] dan tfidf_kunci_bigram[i]
+        ELSE
+            bigram_cosim[i] ← 0
+        END IF
+    END FOR
+
+    RETURN bigram_cosim
+END FUNCTION
+
+FUNCTION wc_ratio(kolom_jawaban, kolom_kunci_jawaban)
+    k ← 5
+    wc_ratio ← array kosong
+    jawaban_list ← daftar string dari kolom_jawab
+    kunci_jawaban ← elemen pertama dari kolom_kunci_jawaban
+    word_limit ← jumlah kata dalam kunci_jawaban
+
+    FOR EACH jawaban_siswa IN jawaban_list DO
+        word_count ← jumlah kata dalam jawaban_siswa
+        raw_wcr ← 1 - (word_count / word_limit)
+        nilai_ratio ← 1 / (1 + exp(-k × raw_wcr))
+        APPEND nilai_ratio TO wc_ratio
+    END FOR
+
+    RETURN wc_ratio
+END FUNCTION
+
+FUNCTION tt_ratio(kolom_jawaban)
+    tt_ratio ← array kosong
+    jawaban_list ← daftar string dari kolom_jawab
+
+    FOR EACH jawaban_siswa IN jawaban_list DO
+        token_jawaban ← hasil pemisahan jawaban_siswa berdasarkan spasi
+        type_jawaban ← token unik dari token_jawaban
+
+        IF panjang dari type_jawaban = 0 THEN
+            ttr ← 0
+        ELSE
+            ttr ← panjang type_jawaban dibagi panjang token_jawaban
+        END IF
+
+        APPEND ttr TO tt_ratio
+    END FOR
+
+    RETURN tt_ratio
+
+FUNCTION features_combine(arrays)
+    reshaped_array ← array kosong
+    FOR EACH arr IN arrays DO
+        ubah arr menjadi Series, lalu ubah ke bentuk DataFrame satu kolom
+        APPEND arr TO reshaped_array 
+    END FOR
+
+    hasil_gabungan ← gabungkan seluruh elemen dalam reshaped_array secara kolom
+
+    RETURN hasil_gabungan

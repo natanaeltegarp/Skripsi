@@ -3,7 +3,7 @@ import processFunction as pf
 
 ### INITIALIZATION ###
 
-csv_file_path = 'testSet-ukdw.csv'
+csv_file_path = 'stelma-test-split.csv'
 data_csv = pd.read_csv(csv_file_path)
 ######################
 

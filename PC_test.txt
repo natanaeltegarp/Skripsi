@@ -1,0 +1,17 @@
+LOAD fitur_data_uji
+LOAD file_model
+model ← file_model
+
+x ← kolom 'Cosim-Unigram', 'Cosim-Bigram', 'TypeTokenRatio', dan 'WordCountRatio' dari fitur_data_uji
+y ← kolom 'label' dari fitur_data_uji
+
+y_pred ← hasil prediksi model terhadap x
+
+cm ← confusion_matrix dari y dan y_pred
+
+classification_report ← classification_report dari y dan y_pred
+
+rmse ← root_mean_squared_error dari y dan y_pred
+
+PRINT cm, classification_report, rmse
+

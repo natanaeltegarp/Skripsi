@@ -1,0 +1,18 @@
+file ← file dari request
+data ← CONVERT file ke DataFrame
+features_data ← preprocess(data)
+idsoal_list ← nilai unik dari kolom id_soal dalam features_data
+
+all_pred ← dictionary kosong
+
+FOR EACH idsoal IN idsoal_list:
+    subset ← seluruh baris features_data yang memiliki nilai kolom id_soal = idsoal
+    features_csv ← fitur 'Cosim-Unigram', 'Cosim-Bigram', 'TypeTokenRatio', dan 'WordCountRatio' dari subset
+    pred ← hasil prediksi model terhadap features_csv
+    pred_dict ← dictionary yang memetakan id_jawaban ke label prediksi
+
+    APPEND pred_dict ke dalam all_pred
+END FOR
+
+RETURN all_pred dalam bentuk JSON
+

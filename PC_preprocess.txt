@@ -1,0 +1,19 @@
+LOAD dataset_csv
+
+FOR jawaban IN dataset_csv DO
+    preprocess(jawaban)
+END FOR
+
+FOR kunci_jawaban IN dataset_csv DO
+    preprocess(kunci_jawaban)
+END FOR
+
+unigram_feature ← unigram_cosim(kolom_jawaban, kolom_kunci_jawaban)
+bigram_feature ← bigram_cosim(kolom_jawaban, kolom_kunci_jawaban)
+wc_ratio_feature ← wc_ratio(kolom_jawaban, kolom_kunci_jawaban)
+tt_ratio_feature ← tt_ratio(kolom_jawaban)
+
+fitur_dataset ← features_combine(id_soal, unigram_feature, bigram_feature, wc_ratio_feature, tt_ratio_feature, label)
+
+SAVE fitur_dataset ke file CSV
+
